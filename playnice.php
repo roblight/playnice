@@ -17,9 +17,32 @@
 include 'class.google.php';
 include 'class.sosumi.php';
 
-$mobileMePasswordFile = "./mobile-me-password.txt";
+if ($argc < 3) {
+    $help = <<<HELP
+Usage:
+    php playnice.php <username> <deviceId>
+Where:
+    username - Pick something.  Anything.  It can be your me.com or google.com
+               username, but remember it because that will be the "key" to
+               finding your cached me.com and google.com credentials later.
+    deviceId - First time running the script, pick something.  Like the number
+               1.  You'll see a list of real device IDs (they look like SHA1s)
+               listed in the order as shown on your "Find My iPhone" page on
+               the me.com site.  Second time running he script use the device
+               ID that goes with the me.com and google.com credentials as
+               identified by the <username> argument.
 
-$google = new googleLatitude();
+HELP;
+    echo $help;
+    exit;
+}
+
+$username = $argv[1];
+$deviceId = $argv[2];
+
+$mobileMePasswordFile = "./mobile-me-password-$username.txt";
+
+$google = new GoogleLatitude($username);
 
 function promptForLogin($serviceName)
 {
@@ -79,20 +102,24 @@ if (! $google->haveCookie()) {
 }
 
 // Get the iPhone location from MobileMe
-echo "Fetching iPhone location...";
+echo "Fetching iPhone information...";
 $mobileMe = new Sosumi ($mobileMeUsername, $mobileMePassword);
 if (! $mobileMe->authenticated) {
     echo "Unable to authenticate to MobileMe. Is your password correct?\n";
     exit;
 }
-
 if (count ($mobileMe->devices) == 0) {
     echo "No iPhones found in your MobileMe account.\n";
     exit;
 }
-$iphoneLocation = $mobileMe->locate();
+echo "found ".count($mobileMe->devices)." device(s):\n";
+reset($mobileMe->devices);
+foreach ($mobileMe->devices as $device) {
+  echo "Device ID: ".$device['deviceId']."\n";
+}
+echo "Determining iPhone location...";
+$iphoneLocation = $mobileMe->locate($mobileMe->devices[$deviceId]);
 echo "got it.\n";
-
 echo "iPhone location: $iphoneLocation->latitude, $iphoneLocation->longitude\n";
 
 // Now update Google Latitude

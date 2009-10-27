@@ -15,9 +15,9 @@ class googleLatitude
 	private $cookieFile; // Where we store the Google session cookie
 	private $lastURL;    // The previous URL as visited by curl
 
-	public function __construct()
+	public function __construct($username)
 	{
-		$this->cookieFile = dirname(__FILE__) . "/google-cookie.txt";
+		$this->cookieFile = dirname(__FILE__) . "/google-cookie-$username.txt";
 	}
 
 	// Update the location on google latitude
