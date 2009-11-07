@@ -165,7 +165,7 @@
             {
                 $values = str_replace("'", '', $matches[1][$i]);
                 list($unknown, $id, $type, $class, $os) = explode(',', $values);
-                $this->devices[$id] = array('deviceId' => $id, 'deviceType' => $type, 'deviceClass' => $class, 'deviceOsVersion' => $os);
+                $this->devices[trim($id)] = array('deviceId' => $id, 'deviceType' => $type, 'deviceClass' => $class, 'deviceOsVersion' => $os);
             }
         }
 
